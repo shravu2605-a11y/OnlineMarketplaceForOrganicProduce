@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
 COPY *.csproj ./
@@ -12,5 +12,7 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 EXPOSE 8080
+
 ENV ASPNETCORE_URLS=http://+:8080
+
 ENTRYPOINT ["dotnet", "WebApplication_shravani.dll"]
