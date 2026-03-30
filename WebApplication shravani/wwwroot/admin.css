@@ -1,0 +1,40 @@
+﻿body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+.navbar {
+    background: #222;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+    .navbar a {
+        color: lime;
+        text-decoration: none;
+        padding: 5px 10px;
+    }
+
+        .navbar a:hover {
+            background: gold;
+            color: black;
+            border-radius: 5px;
+        }
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    flex: 1;
+    text-align: center;
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}

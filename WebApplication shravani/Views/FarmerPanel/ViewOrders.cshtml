@@ -1,0 +1,319 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "View Orders";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Orders - Farmer Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            position: fixed;
+            width: 260px;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                padding: 12px 20px;
+                display: block;
+                transition: 0.3s;
+            }
+
+                .sidebar a:hover {
+                    background: rgba(255,255,255,0.2);
+                    padding-left: 30px;
+                }
+
+                .sidebar a.active {
+                    background: rgba(255,255,255,0.3);
+                    border-left: 4px solid #ffc107;
+                }
+
+                .sidebar a i {
+                    margin-right: 10px;
+                    width: 25px;
+                }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .top-nav h4 {
+                margin: 0;
+                color: #2e7d32;
+            }
+
+        .top-nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .home-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+            .home-btn:hover {
+                background: #138496;
+                color: white;
+            }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .logout-btn:hover {
+                background: #c82333;
+                transform: scale(1.05);
+            }
+
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .order-header {
+            background: #e8f5e9;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .status-shipped {
+            background: #007bff;
+            color: white;
+        }
+
+        .status-delivered {
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="text-center p-4">
+            <i class="fas fa-leaf fa-3x"></i>
+            <h4 class="mt-2">Farmer Panel</h4>
+            <hr class="bg-white" />
+        </div>
+        <div class="nav flex-column">
+            <a asp-controller="FarmerPanel" asp-action="Dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a asp-controller="FarmerPanel" asp-action="AddProduct">
+                <i class="fas fa-plus-circle"></i> Add Product
+            </a>
+            <a asp-controller="FarmerPanel" asp-action="MyProducts">
+                <i class="fas fa-box"></i> My Products
+            </a>
+            <a asp-controller="FarmerPanel" asp-action="ViewOrders" class="active">
+                <i class="fas fa-shopping-cart"></i> View Orders
+            </a>
+            <a asp-controller="FarmerPanel" asp-action="Profile">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-nav">
+            <h4><i class="fas fa-shopping-cart text-primary"></i> Customer Orders</h4>
+            <div class="top-nav-buttons">
+                <a asp-controller="Home" asp-action="Index" class="home-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="mb-4">Customer Orders</h2>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (Model != null && Model.Any())
+        {
+            foreach (var order in Model)
+            {
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-receipt"></i> Order #@order.OrderId</strong>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <strong>Date:</strong> @order.Order?.OrderDate.ToString("dd MMM yyyy")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Customer:</strong> @order.Order?.Name
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Delivery Address:</strong> @order.Order?.Address
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in order.Items)
+                                    {
+                                        <tr>
+                                            <td>@item.Product?.Name</td>
+                                            <td>@item.Quantity</td>
+                                            <td>₹@item.Price</td>
+                                            <td>₹@(item.Quantity* item.Price)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-warning">
+                                        <td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+                                        <td><strong>₹@order.TotalAmount</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <strong>Status:</strong>
+                                @{
+                                    string statusClass = "";
+                                    switch (order.Order?.Status)
+                                    {
+                                        case "Pending":
+                                            statusClass = "status-pending";
+                                            break;
+                                        case "Processing":
+                                            statusClass = "status-processing";
+                                            break;
+                                        case "Shipped":
+                                            statusClass = "status-shipped";
+                                            break;
+                                        case "Delivered":
+                                            statusClass = "status-delivered";
+                                            break;
+                                        default:
+                                            statusClass = "status-pending";
+                                            break;
+                                    }
+                                }
+                                <span class="status-badge @statusClass">@order.Order?.Status</span>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                    <select name="status" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h4>No Orders Yet</h4>
+                <p>You haven't received any orders for your products yet.</p>
+            </div>
+        }
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

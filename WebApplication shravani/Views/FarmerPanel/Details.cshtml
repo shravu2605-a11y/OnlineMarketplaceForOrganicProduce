@@ -1,0 +1,59 @@
+﻿@model WebApplication_shravani.Models.Farmer
+
+<h2 class="text-center mb-4">👨‍🌾 Farmer Profile</h2>
+
+<div class="card p-4 shadow mb-4">
+
+    <h3>@Model.Name</h3>
+
+    <p><b>Phone:</b> @Model.Phone</p>
+    <p><b>City:</b> @Model.City</p>
+    <p><b>Area:</b> @Model.Area</p>
+    <p><b>Farm Type:</b> @Model.FarmType</p>
+    <p><b>Certification:</b> @Model.Certification</p>
+    <p><b>Certificate Number:</b> @Model.CertificateNumber</p>
+
+    <p><b>Certification Date:</b> @Model.CertificationDate?.ToShortDateString()</p>
+
+    <img src="@Model.CertificateImage" width="200" />
+
+</div>
+
+<h3 class="mb-3">🌱 Products Grown By This Farmer</h3>
+
+<table class="table table-bordered">
+
+    <thead class="table-dark">
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Image</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model.Products != null && Model.Products.Any())
+        {
+            foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>₹@product.Price</td>
+                    <td>@product.Category</td>
+
+                    <td>
+                        <img src="@product.ImageUrl" width="80" />
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No products found for this farmer.</td>
+            </tr>
+        }
+    </tbody>
+
+</table>

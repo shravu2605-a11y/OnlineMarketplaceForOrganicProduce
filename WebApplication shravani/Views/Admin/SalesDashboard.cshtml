@@ -1,0 +1,164 @@
+﻿@model List<WebApplication_shravani.Models.ViewModels.SalesViewModel>
+
+@{
+    ViewData["Title"] = "Sales Dashboard";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .card-animate {
+        transition: 0.3s;
+        border-radius: 15px;
+    }
+
+        .card-animate:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+    .counter {
+        font-size: 30px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4">📊 Advanced Sales Dashboard</h2>
+
+    <!-- Animated Counters -->
+    <div class="row text-center mb-4">
+
+        <div class="col-md-4">
+            <div class="card bg-success text-white p-3 card-animate">
+                <h5>Total Orders</h5>
+                <div class="counter" id="ordersCounter">0</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-primary text-white p-3 card-animate">
+                <h5>Total Products</h5>
+                <div class="counter" id="productsCounter">0</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-dark text-white p-3 card-animate">
+                <h5>Total Revenue</h5>
+                <div class="counter" id="revenueCounter">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="row">
+
+        <!-- Bar Chart -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                <h5 class="text-center">📊 Product Sales</h5>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                <h5 class="text-center">🥧 Sales Distribution</h5>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+        <div class="card mt-4 p-3 shadow">
+            <h5 class="text-center">📈 Monthly Sales</h5>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const labels = [];
+    const data = [];
+
+    @foreach (var item in Model)
+    {
+            <text>
+                labels.push("@item.ProductName");
+                data.push(@item.TotalSold);
+            </text>
+    }
+
+    // BAR CHART
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Sold',
+                data: data,
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // PIE CHART
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data
+            }]
+        }
+    });
+
+    // ANIMATED COUNTERS
+    function animateValue(id, start, end, duration) {
+        let range = end - start;
+        let current = start;
+        let increment = end > start ? 1 : -1;
+        let stepTime = Math.abs(Math.floor(duration / range));
+        let obj = document.getElementById(id);
+
+        let timer = setInterval(function () {
+            current += increment;
+            obj.innerHTML = current;
+            if (current == end) {
+                clearInterval(timer);
+            }
+        }, stepTime);
+    }
+
+    animateValue("ordersCounter", 0, @ViewBag.TotalOrders, 1000);
+    animateValue("productsCounter", 0, @ViewBag.TotalProducts, 1000);
+    animateValue("revenueCounter", 0, @ViewBag.TotalRevenue, 1000);
+    
+        const months = [];
+        const monthlyData = [];
+
+           @if (ViewBag.MonthlySales != null)
+    {
+            foreach (var m in ViewBag.MonthlySales)
+            {
+                    <text>
+                        months.push("Month " + @m.Month);
+                        monthlyData.push(@m.Total);
+                    </text>
+            }
+    }
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Revenue',
+                    data: monthlyData,
+                    fill: false,
+                    tension: 0.3
+                }]
+            }
+        });
+</script>

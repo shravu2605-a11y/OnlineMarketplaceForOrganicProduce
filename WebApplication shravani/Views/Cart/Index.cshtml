@@ -1,0 +1,347 @@
+﻿@model List<WebApplication_shravani.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .cart-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .cart-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+        .cart-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+    .cart-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+
+        .cart-table th {
+            background: #e8f5e9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .cart-table td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    /* Quantity Controls with + and - */
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .qty-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: #2e7d32;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .qty-btn:hover {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
+
+        .qty-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    .quantity-input {
+        width: 50px;
+        text-align: center;
+        font-size: 16px;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-buy-now {
+        background: linear-gradient(135deg, #ff5722, #ff9800);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-left: 8px;
+    }
+
+        .btn-remove:hover, .btn-buy-now:hover {
+            transform: scale(1.05);
+        }
+
+    .cart-summary {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-checkout {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-checkout:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="cart-container">
+    <!-- NO HEADER - Removed completely -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="cart-table table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-product-id="@item.ProductId" data-price="@item.Price">
+                            <td class="fw-bold">@item.ProductName</td>
+                            <td>
+                                <img src="@item.ImageUrl" class="product-img" alt="@item.ProductName" onerror="this.src='/images/products/default.jpg'">
+                            </td>
+                            <td class="text-success fw-bold">₹@item.Price</td>
+                            <td>
+                                <div class="quantity-control">
+                                    <button class="qty-btn qty-decrease" data-id="@item.ProductId">-</button>
+                                    <input type="number" class="quantity-input" id="qty-@item.ProductId" value="@item.Quantity" min="1" data-id="@item.ProductId">
+                                    <button class="qty-btn qty-increase" data-id="@item.ProductId">+</button>
+                                </div>
+                            </td>
+                            <td class="item-total" id="total-@item.ProductId">₹<span>@(item.Price* item.Quantity)</span></td>
+                            <td>
+                                <button class="btn-remove" onclick="removeFromCart(@item.ProductId)">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                                <button class="btn-buy-now" onclick="buyNow(@item.ProductId)">
+                                    <i class="fas fa-bolt"></i> Buy Now
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-summary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4>Order Summary</h4>
+                    <p><strong>Total Items:</strong> <span id="totalItems">@Model.Sum(x => x.Quantity)</span></p>
+                    <p><strong>Subtotal:</strong> <span class="text-success fw-bold">₹<span id="grandTotal">@Model.Sum(x => x.Price * x.Quantity)</span></span></p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a asp-controller="Order" asp-action="CheckoutFromCart" class="btn-checkout">
+                        <i class="fas fa-credit-card"></i> Checkout All Items
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h3>Your cart is empty!</h3>
+            <p>Looks like you haven't added any items to your cart yet.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-success mt-3">
+                <i class="fas fa-shopping-bag"></i> Continue Shopping
+            </a>
+        </div>
+    }
+</div>
+
+<script>
+    function updateItemTotal(productId, price, quantity) {
+        const total = price * quantity;
+        document.getElementById(`total-${productId}`).innerHTML = `₹<span>${total}</span>`;
+        updateGrandTotal();
+    }
+
+    function updateGrandTotal() {
+        let grandTotal = 0;
+        let totalItems = 0;
+        document.querySelectorAll('.cart-table tbody tr').forEach(row => {
+            const price = parseFloat(row.getAttribute('data-price'));
+            const quantity = parseInt(row.querySelector('.quantity-input').value);
+            grandTotal += price * quantity;
+            totalItems += quantity;
+        });
+        document.getElementById('grandTotal').innerText = grandTotal;
+        document.getElementById('totalItems').innerText = totalItems;
+    }
+
+    // Decrease quantity
+    document.querySelectorAll('.qty-decrease').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            const input = document.getElementById(`qty-${productId}`);
+            let val = parseInt(input.value);
+            if (val > 1) {
+                input.value = val - 1;
+                const price = parseFloat(document.querySelector(`tr[data-product-id="${productId}"]`).getAttribute('data-price'));
+                updateItemTotal(productId, price, val - 1);
+                updateCartQuantity(productId, val - 1);
+            }
+        });
+    });
+
+    // Increase quantity
+    document.querySelectorAll('.qty-increase').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-id');
+            const input = document.getElementById(`qty-${productId}`);
+            let val = parseInt(input.value);
+            input.value = val + 1;
+            const price = parseFloat(document.querySelector(`tr[data-product-id="${productId}"]`).getAttribute('data-price'));
+            updateItemTotal(productId, price, val + 1);
+            updateCartQuantity(productId, val + 1);
+        });
+    });
+
+    // Manual input change
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            let val = parseInt(this.value);
+            if (isNaN(val) || val < 1) val = 1;
+            this.value = val;
+            const productId = this.getAttribute('data-id');
+            const price = parseFloat(document.querySelector(`tr[data-product-id="${productId}"]`).getAttribute('data-price'));
+            updateItemTotal(productId, price, val);
+            updateCartQuantity(productId, val);
+        });
+    });
+
+    function updateCartQuantity(productId, quantity) {
+        fetch('/Order/UpdateCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+            },
+            body: JSON.stringify({ productId: productId, quantity: quantity })
+        }).catch(error => console.error('Error updating cart:', error));
+    }
+
+    // FIXED: Remove from Cart function
+    function removeFromCart(productId) {
+        if (confirm('Are you sure you want to remove this item from cart?')) {
+            fetch(`/Order/RemoveFromCart?productId=${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to update cart
+                    window.location.reload();
+                } else {
+                    alert('Error removing item. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error removing item. Please try again.');
+            });
+        }
+    }
+
+    function buyNow(productId) {
+        window.location.href = `/Order/BuyNow/${productId}`;
+    }
+</script>

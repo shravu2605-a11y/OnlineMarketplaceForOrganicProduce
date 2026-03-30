@@ -1,0 +1,32 @@
+﻿@model WebApplication_shravani.Models.Farmer
+
+<h2>Add Farmer</h2>
+
+<form asp-action="Create" method="post">
+
+    <div class="form-group">
+        <label>Farmer Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Location</label>
+        <input asp-for="Location" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Phone</label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success">
+        Save Farmer
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Back
+    </a>
+
+</form>

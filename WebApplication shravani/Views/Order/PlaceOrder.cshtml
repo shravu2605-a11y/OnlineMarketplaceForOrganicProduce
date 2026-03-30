@@ -1,0 +1,434 @@
+﻿@{
+    ViewData["Title"] = "Place Order";
+    Layout = null;
+}
+
+<style>
+    .order-container {
+        max-width: 1000px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+        .order-header h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+    .order-body {
+        padding: 40px;
+    }
+
+    /* For multiple items (cart checkout) */
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+        .cart-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .cart-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    /* For single product (buy now) */
+    .single-product {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .product-image {
+        flex: 1;
+        text-align: center;
+    }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2e7d32;
+        margin-bottom: 10px;
+    }
+
+    .product-price {
+        font-size: 32px;
+        font-weight: bold;
+        color: #ff5722;
+        margin: 20px 0;
+    }
+
+        .product-price small {
+            font-size: 14px;
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+
+    .product-description {
+        color: #666;
+        line-height: 1.6;
+        margin: 20px 0;
+    }
+
+    .quantity-selector {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: #2e7d32;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .quantity-btn:hover {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
+
+        .quantity-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+    .quantity-input {
+        width: 80px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 8px;
+        border: 2px solid #2e7d32;
+        border-radius: 10px;
+    }
+
+    .total-amount {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+        text-align: center;
+    }
+
+        .total-amount h3 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .total-amount .amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+    .place-order-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #ff5722, #ff9800);
+        color: white;
+        border: none;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+    }
+
+        .place-order-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255,87,34,0.3);
+        }
+
+    .delivery-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .rating {
+        color: #ffc107;
+        margin: 10px 0;
+    }
+</style>
+
+<div class="order-container">
+    <div class="order-header">
+        <h2><i class="fas fa-shopping-cart"></i> Place Your Order</h2>
+        <p>Review your items and adjust quantities</p>
+    </div>
+
+    <div class="order-body">
+        @if (ViewBag.IsBuyNow == true && ViewBag.Product != null)
+        {
+            <!-- SINGLE PRODUCT VIEW (BUY NOW) -->
+            var product = ViewBag.Product;
+            var quantity = ViewBag.Quantity;
+
+            <div class="single-product">
+                <div class="product-image">
+                    <img src="@product.ImageUrl" alt="@product.Name" onerror="this.src='/images/products/default.jpg'">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">@product.Name</div>
+
+                    <div class="rating">
+                        @if (product.AverageRating > 0)
+                        {
+                            for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= product.AverageRating)
+                                {
+                                    <i class="fas fa-star"></i>
+                                }
+                                else
+                                {
+                                    <i class="far fa-star"></i>
+                                }
+                            }
+                            <span class="text-muted ms-2">(@product.TotalReviews reviews)</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No reviews yet</span>
+                        }
+                    </div>
+
+                    <div class="product-price">
+                        ₹<span id="unitPrice">@product.Price</span>
+                        <small>₹@(product.Price + 50)</small>
+                        <span class="badge bg-success ms-2">Save ₹50</span>
+                    </div>
+
+                    <div class="product-description">
+                        @product.Description
+                    </div>
+
+                    <div class="quantity-selector">
+                        <strong><i class="fas fa-shopping-cart"></i> Select Quantity:</strong>
+                        <div class="quantity-control">
+                            <button type="button" class="quantity-btn" id="decreaseBtn">-</button>
+                            <input type="number" id="quantity" value="@quantity" min="1" max="@product.StockQuantity" class="quantity-input" readonly>
+                            <button type="button" class="quantity-btn" id="increaseBtn">+</button>
+                            <span class="text-muted ms-2">Available: @product.StockQuantity units</span>
+                        </div>
+                    </div>
+
+                    <div class="total-amount">
+                        <h3>Total Amount</h3>
+                        <div class="amount">₹<span id="totalAmount">@(product.Price* quantity)</span></div>
+                    </div>
+
+                    <form id="placeOrderForm" method="post" asp-action="ProceedToLocation">
+                        <input type="hidden" name="productId" value="@product.ProductId" />
+                        <input type="hidden" name="quantity" id="hiddenQuantity" value="@quantity" />
+                        <button type="submit" class="place-order-btn">
+                            <i class="fas fa-map-marker-alt"></i> Proceed to Location
+                        </button>
+                    </form>
+
+                    <div class="delivery-info">
+                        <i class="fas fa-truck"></i>
+                        <span>Free Delivery on this product | Estimated delivery in 3-5 days</span>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const price = @product.Price;
+                const maxStock = @product.StockQuantity;
+                const quantityInput = document.getElementById('quantity');
+                const totalAmountSpan = document.getElementById('totalAmount');
+                const hiddenQuantity = document.getElementById('hiddenQuantity');
+                const decreaseBtn = document.getElementById('decreaseBtn');
+                const increaseBtn = document.getElementById('increaseBtn');
+
+                function updateTotal() {
+                    let qty = parseInt(quantityInput.value);
+                    let total = price * qty;
+                    totalAmountSpan.textContent = total;
+                    hiddenQuantity.value = qty;
+                    decreaseBtn.disabled = qty <= 1;
+                    increaseBtn.disabled = qty >= maxStock;
+                }
+
+                decreaseBtn.addEventListener('click', function() {
+                    let currentVal = parseInt(quantityInput.value);
+                    if (currentVal > 1) {
+                        quantityInput.value = currentVal - 1;
+                        updateTotal();
+                    }
+                });
+
+                increaseBtn.addEventListener('click', function() {
+                    let currentVal = parseInt(quantityInput.value);
+                    if (currentVal < maxStock) {
+                        quantityInput.value = currentVal + 1;
+                        updateTotal();
+                    }
+                });
+
+                updateTotal();
+            </script>
+        }
+        else
+        {
+            <!-- MULTIPLE PRODUCTS VIEW (CART CHECKOUT) -->
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.CartItems)
+                    {
+                        <tr data-product-id="@item.ProductId" data-price="@item.Price">
+                            <td class="fw-bold">@item.ProductName</td>
+                            <td><img src="@item.ImageUrl" class="product-img" onerror="this.src='/images/products/default.jpg'"></td>
+                            <td>
+                                <div class="quantity-control">
+                                    <button type="button" class="quantity-btn decrease" data-id="@item.ProductId">-</button>
+                                    <input type="number" class="quantity-input" id="qty-@item.ProductId" value="@item.Quantity" min="1">
+                                    <button type="button" class="quantity-btn increase" data-id="@item.ProductId">+</button>
+                                </div>
+                            </td>
+                            <td>₹<span class="item-price">@item.Price</span></td>
+                            <td class="item-total" id="total-@item.ProductId">₹<span>@(item.Price* item.Quantity)</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="total-amount">
+                <h3>Total Amount</h3>
+                <div class="amount">₹<span id="grandTotal">@ViewBag.TotalAmount</span></div>
+            </div>
+
+            <form id="placeOrderForm" method="post" asp-action="ProceedToLocation">
+                <button type="submit" class="place-order-btn">
+                    <i class="fas fa-map-marker-alt"></i> Proceed to Location
+                </button>
+            </form>
+
+            <script>
+                function updateGrandTotal() {
+                    let total = 0;
+                    document.querySelectorAll('.cart-table tbody tr').forEach(row => {
+                        const price = parseFloat(row.getAttribute('data-price'));
+                        const quantity = parseInt(row.querySelector('.quantity-input').value);
+                        total += price * quantity;
+                        const productId = row.getAttribute('data-product-id');
+                        document.getElementById(`total-${productId}`).innerHTML = `₹<span>${price * quantity}</span>`;
+                    });
+                    document.getElementById('grandTotal').innerText = total;
+                }
+
+                document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const productId = this.getAttribute('data-id');
+                        const input = document.getElementById(`qty-${productId}`);
+                        let val = parseInt(input.value);
+                        if (val > 1) {
+                            input.value = val - 1;
+                            updateGrandTotal();
+                            fetch('/Order/UpdatePlaceOrderQuantity', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ productId: productId, quantity: val - 1 })
+                            });
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const productId = this.getAttribute('data-id');
+                        const input = document.getElementById(`qty-${productId}`);
+                        let val = parseInt(input.value);
+                        input.value = val + 1;
+                        updateGrandTotal();
+                        fetch('/Order/UpdatePlaceOrderQuantity', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId: productId, quantity: val + 1 })
+                        });
+                    });
+                });
+            </script>
+        }
+    </div>
+</div>

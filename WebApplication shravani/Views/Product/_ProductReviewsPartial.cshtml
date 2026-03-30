@@ -1,0 +1,32 @@
+﻿@model WebApplication_shravani.Models.Product
+
+@if (Model.Reviews != null && Model.Reviews.Any())
+{
+    foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedDate))
+    {
+        <div class="review-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="rating-display mb-1">
+                        @await Html.PartialAsync("_StarRatingPartial", review.Rating)
+                    </div>
+                    <strong>@review.Customer?.UserName</strong>
+                    @if (review.IsVerifiedPurchase)
+                    {
+                        <span class="verified-badge">Verified Purchase</span>
+                    }
+                </div>
+                <small class="text-muted">
+                    @review.CreatedDate.ToString("MMM dd, yyyy")
+                </small>
+            </div>
+            <p class="mt-2 mb-0">@review.Comment</p>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No reviews yet. Be the first to review this product!
+    </div>
+}

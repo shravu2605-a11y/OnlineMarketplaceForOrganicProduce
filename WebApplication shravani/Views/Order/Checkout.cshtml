@@ -1,0 +1,21 @@
+﻿@model WebApplication_shravani.Models.Product
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Checkout</h1>
+
+<div style="background:white;padding:20px;border-radius:10px;width:350px">
+    <img src="@Model.ImageUrl" width="150" />
+    <h2>@Model.Name</h2>
+    <p><b>Price:</b> ₹@Model.Price</p>
+
+    <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+        <input type="hidden" name="ProductId" value="@Model.ProductId" />
+
+        <button type="submit"
+                style="padding:10px 20px;background:green;color:white;border:none;border-radius:5px;">
+            Place Order
+        </button>
+    </form>
+</div>

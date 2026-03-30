@@ -1,0 +1,283 @@
+﻿@model WebApplication_shravani.Models.Product
+
+@{
+    ViewData["Title"] = "Place Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .order-container {
+        max-width: 800px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 25px;
+        text-align: center;
+    }
+
+        .order-header h2 {
+            margin: 0;
+        }
+
+    .order-body {
+        padding: 30px;
+    }
+
+    .product-details {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+        .product-details img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2e7d32;
+    }
+
+    .product-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff5722;
+        margin-top: 5px;
+    }
+
+    .quantity-selector {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: #2e7d32;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .quantity-btn:hover {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
+
+    .quantity-input {
+        width: 80px;
+        text-align: center;
+        font-size: 18px;
+        padding: 8px;
+        border: 2px solid #2e7d32;
+        border-radius: 10px;
+    }
+
+    .total-amount {
+        background: #e8f5e9;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: right;
+    }
+
+        .total-amount h3 {
+            margin: 0;
+            color: #2e7d32;
+        }
+
+    .address-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #eee;
+    }
+
+        .address-section textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+    .btn-proceed {
+        background: linear-gradient(135deg, #ff5722, #ff9800);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+        .btn-proceed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,87,34,0.3);
+        }
+
+    .btn-back {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+        .btn-back:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+</style>
+
+<div class="order-container">
+    <div class="order-header">
+        <h2><i class="fas fa-shopping-cart"></i> Place Order</h2>
+        <p>Review your order and enter delivery details</p>
+    </div>
+
+    <div class="order-body">
+        <div class="product-details">
+            <img src="@Model.ImageUrl" alt="@Model.Name" onerror="this.src='/images/products/default.jpg'">
+            <div class="product-info">
+                <div class="product-name">@Model.Name</div>
+                <div class="product-price">₹@Model.Price</div>
+                <div class="text-muted">@Model.Description</div>
+            </div>
+        </div>
+
+        <div class="quantity-selector">
+            <strong><i class="fas fa-calculator"></i> Select Quantity:</strong>
+            <div class="quantity-control">
+                <button type="button" class="quantity-btn" id="decreaseBtn">-</button>
+                <input type="number" id="quantity" value="1" min="1" max="@Model.StockQuantity" class="quantity-input" readonly>
+                <button type="button" class="quantity-btn" id="increaseBtn">+</button>
+                <span class="text-muted ms-2">Available: @Model.StockQuantity units</span>
+            </div>
+        </div>
+
+        <div class="total-amount">
+            <h3>Total Amount: ₹<span id="totalAmount">@Model.Price</span></h3>
+        </div>
+
+        <div class="address-section">
+            <label class="form-label fw-bold">Delivery Address</label>
+            <textarea id="address" name="address" rows="3" required
+                      placeholder="Enter your complete delivery address with landmark, city, and pincode"></textarea>
+        </div>
+
+        <form id="placeOrderForm" method="post" asp-action="ProceedToLocation">
+            <input type="hidden" name="productId" value="@Model.ProductId" />
+            <input type="hidden" name="quantity" id="hiddenQuantity" value="1" />
+            <input type="hidden" name="address" id="hiddenAddress" />
+            <button type="submit" class="btn-proceed">
+                <i class="fas fa-map-marker-alt"></i> Proceed to Location Confirmation
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a asp-controller="Home" asp-action="Index" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const price = @Model.Price;
+    const maxStock = @Model.StockQuantity;
+    const quantityInput = document.getElementById('quantity');
+    const totalAmountSpan = document.getElementById('totalAmount');
+    const hiddenQuantity = document.getElementById('hiddenQuantity');
+    const decreaseBtn = document.getElementById('decreaseBtn');
+    const increaseBtn = document.getElementById('increaseBtn');
+    const addressTextarea = document.getElementById('address');
+    const hiddenAddress = document.getElementById('hiddenAddress');
+
+    function updateTotal() {
+        let qty = parseInt(quantityInput.value);
+        let total = price * qty;
+        totalAmountSpan.textContent = total;
+        hiddenQuantity.value = qty;
+
+        decreaseBtn.disabled = qty <= 1;
+        increaseBtn.disabled = qty >= maxStock;
+    }
+
+    decreaseBtn.addEventListener('click', function() {
+        let currentVal = parseInt(quantityInput.value);
+        if (currentVal > 1) {
+            quantityInput.value = currentVal - 1;
+            updateTotal();
+        }
+    });
+
+    increaseBtn.addEventListener('click', function() {
+        let currentVal = parseInt(quantityInput.value);
+        if (currentVal < maxStock) {
+            quantityInput.value = currentVal + 1;
+            updateTotal();
+        }
+    });
+
+    document.getElementById('placeOrderForm').addEventListener('submit', function(e) {
+        const address = addressTextarea.value.trim();
+        if (!address) {
+            e.preventDefault();
+            alert('Please enter your delivery address');
+            addressTextarea.focus();
+            return false;
+        }
+        if (address.length < 10) {
+            e.preventDefault();
+            alert('Please enter a complete address (minimum 10 characters)');
+            addressTextarea.focus();
+            return false;
+        }
+        hiddenAddress.value = address;
+    });
+
+    updateTotal();
+</script>

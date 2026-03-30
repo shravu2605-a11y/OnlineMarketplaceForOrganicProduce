@@ -1,0 +1,46 @@
+﻿@model List<WebApplication_shravani.Models.Order>
+
+<h2>All Orders</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>User</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderId</td>
+                <td>@order.Name</td>
+                <td>@order.TotalAmount</td>
+                <td>@order.Status</td>
+                <td>@order.OrderDate</td>
+
+                <td>
+                    <form asp-action="UpdateOrderStatus" method="post">
+                        <input type="hidden" name="id" value="@order.OrderId" />
+
+                        <select name="status">
+                            <option>Pending</option>
+                            <option>Confirmed</option>
+                            <option>Packed</option>
+                            <option>Shipped</option>
+                            <option>Delivered</option>
+                        </select>
+
+                        <button class="btn btn-success">Update</button>
+                    </form>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,174 @@
+﻿@model WebApplication_shravani.Models.Order
+
+@{
+    ViewData["Title"] = "Track Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    .track-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 20px;
+    }
+
+    .status-timeline {
+        padding: 30px;
+        position: relative;
+    }
+
+    .status-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .status-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        z-index: 2;
+        transition: 0.3s;
+    }
+
+        .status-icon.completed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-icon.active {
+            background: #ff9800;
+            color: white;
+            box-shadow: 0 0 0 5px rgba(255,152,0,0.3);
+        }
+
+    .status-content {
+        flex: 1;
+    }
+
+    .status-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .status-date {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .status-line {
+        position: absolute;
+        left: 24px;
+        top: 50px;
+        width: 2px;
+        height: calc(100% - 30px);
+        background: #e0e0e0;
+        z-index: 1;
+    }
+
+        .status-line.completed {
+            background: #4caf50;
+        }
+</style>
+
+<div class="track-container">
+    <div class="order-card">
+        <div class="order-header">
+            <h3><i class="fas fa-truck"></i> Track Order #@Model.OrderId</h3>
+            <p>Order placed on @Model.OrderDate?.ToString("dd MMM yyyy")</p>
+        </div>
+
+        <div class="status-timeline">
+            <div class="status-line @(Model.Status == "Delivered" ? "completed" : "")"></div>
+
+            <!-- Order Placed -->
+            <div class="status-step">
+                <div class="status-icon @(Model.Status != null ? "completed" : "")">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Order Placed</div>
+                    <div class="status-date">@Model.OrderDate?.ToString("dd MMM yyyy, hh:mm tt")</div>
+                </div>
+            </div>
+
+            <!-- Processing -->
+            <div class="status-step">
+                <div class="status-icon @(Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Delivered" ? "completed" : "")">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Processing</div>
+                    <div class="status-date">@(Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Delivered" ? "Completed" : "Pending")</div>
+                </div>
+            </div>
+
+            <!-- Shipped -->
+            <div class="status-step">
+                <div class="status-icon @(Model.Status == "Shipped" || Model.Status == "Delivered" ? "completed" : "")">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Shipped</div>
+                    <div class="status-date">@(Model.Status == "Shipped" || Model.Status == "Delivered" ? "On the way" : "Not yet shipped")</div>
+                </div>
+            </div>
+
+            <!-- Delivered -->
+            <div class="status-step">
+                <div class="status-icon @(Model.Status == "Delivered" ? "completed active" : "")">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="status-content">
+                    <div class="status-title">Delivered</div>
+                    <div class="status-date">@(Model.Status == "Delivered" ? "Delivered to your address" : "Not yet delivered")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 border-top">
+            <h5>Order Details</h5>
+            <p><strong>Delivery Address:</strong> @Model.Address</p>
+            <p><strong>Total Amount:</strong> <span class="text-success fw-bold">₹@Model.TotalAmount</span></p>
+            <p>
+                <strong>Current Status:</strong>
+                <span class="badge bg-@(Model.Status == "Delivered" ? "success" : Model.Status == "Shipped" ? "info" : Model.Status == "Processing" ? "warning" : "secondary")">
+                    @Model.Status
+                </span>
+            </p>
+        </div>
+
+        <div class="p-3 text-center border-top">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i> Continue Shopping
+            </a>
+            <a asp-controller="Order" asp-action="MyOrders" class="btn btn-secondary ms-2">
+                <i class="fas fa-list"></i> My Orders
+            </a>
+        </div>
+    </div>
+</div>

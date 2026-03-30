@@ -1,0 +1,119 @@
+﻿@model List<WebApplication_shravani.Models.Order>
+
+@{
+    ViewData["Title"] = "My Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    .orders-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .orders-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+    .order-header {
+        background: #e8f5e9;
+        padding: 15px 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .badge-pending {
+        background: #ffc107;
+        color: #856404;
+    }
+
+    .badge-processing {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .badge-shipped {
+        background: #007bff;
+        color: white;
+    }
+
+    .badge-delivered {
+        background: #28a745;
+        color: white;
+    }
+</style>
+
+<div class="orders-container">
+    <div class="orders-header">
+        <h2><i class="fas fa-receipt"></i> My Orders</h2>
+        <p>View and track your orders</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var order in Model)
+        {
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <strong>Order #@order.OrderId</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-calendar-alt"></i> @order.OrderDate?.ToString("dd MMM yyyy")
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge badge-@order.Status?.ToLower()">@order.Status</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <p><strong>Delivery Address:</strong> @order.Address</p>
+                            <p><strong>Total Amount:</strong> <span class="text-success fw-bold">₹@order.TotalAmount</span></p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a asp-action="TrackOrder" asp-route-orderId="@order.OrderId" class="btn btn-primary btn-sm">
+                                <i class="fas fa-truck"></i> Track Order
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-center p-5 bg-white rounded-3 shadow">
+            <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders yet.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-success mt-3">
+                <i class="fas fa-shopping-bag"></i> Start Shopping
+            </a>
+        </div>
+    }
+</div>

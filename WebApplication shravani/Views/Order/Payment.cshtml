@@ -1,0 +1,198 @@
+﻿@model WebApplication_shravani.Models.Order
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2f7;
+        margin: 0;
+    }
+
+    /* MAIN */
+    .payment-container {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* LEFT SUMMARY */
+    .summary {
+        width: 40%;
+        background: #1e293b;
+        color: white;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .summary h2 {
+            margin-bottom: 20px;
+        }
+
+    .summary-box {
+        background: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    /* RIGHT FORM */
+    .payment-form {
+        width: 60%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card-box {
+        width: 420px;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        animation: fadeUp 0.8s ease;
+    }
+
+    /* INPUT */
+    .input-box input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 12px;
+        transition: 0.3s;
+    }
+
+        .input-box input:focus {
+            border-color: #2962ff;
+            box-shadow: 0 0 8px rgba(41,98,255,0.3);
+        }
+
+    /* ROW */
+    .row {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* PAY BUTTON */
+    .pay-btn {
+        width: 100%;
+        padding: 12px;
+        background: #ff5722;
+        border: none;
+        color: white;
+        border-radius: 30px;
+        transition: 0.3s;
+    }
+
+        .pay-btn:hover {
+            background: #e64a19;
+            transform: translateY(-2px);
+        }
+
+    /* PAYPAL */
+    .paypal-container {
+        margin-top: 20px;
+    }
+
+    /* ANIMATION */
+    @@keyframes fadeUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="payment-container">
+
+    <!-- LEFT SIDE -->
+    <div class="summary">
+        <h2>🧾 Order Summary</h2>
+
+        <div class="summary-box">
+            <p><b>Order ID:</b> @Model.OrderId</p>
+            <p><b>Total:</b> ₹@Model.TotalAmount</p>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="payment-form">
+
+        <div class="card-box">
+
+            <h3>💳 Payment Details</h3>
+
+            <form asp-controller="Order" asp-action="PaymentSuccess">
+
+                <div class="input-box">
+                    <input type="text" placeholder="Card Holder Name" required />
+                </div>
+
+                <div class="input-box">
+                    <input type="text" placeholder="Card Number" required />
+                </div>
+
+                <div class="row">
+                    <div class="input-box">
+                        <input type="text" placeholder="MM/YY" required />
+                    </div>
+
+                    <div class="input-box">
+                        <input type="text" placeholder="CVC" required />
+                    </div>
+                </div>
+
+                <input type="hidden" name="orderId" value="@Model.OrderId" />
+
+                <button class="pay-btn">
+                    Pay ₹@Model.TotalAmount
+                </button>
+            </form>
+
+            <hr>
+
+            <div id="paypal-button-container" class="paypal-container"></div>
+
+        </div>
+
+    </div>
+
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
+<script>
+
+    paypal.Buttons({
+
+    createOrder: function(data, actions) {
+    return actions.order.create({
+    purchase_units: [{
+    amount: {
+    value: '@Model.TotalAmount'
+    }
+    }]
+    });
+    },
+
+    onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+
+    window.location.href = "/Order/PaymentSuccess?orderId=@Model.OrderId";
+
+    });
+    }
+
+    }).render('#paypal-button-container');
+
+</script>     

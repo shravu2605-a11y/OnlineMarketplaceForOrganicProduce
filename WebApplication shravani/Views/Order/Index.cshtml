@@ -1,0 +1,246 @@
+﻿@model List<WebApplication_shravani.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background: #f8f9fa;
+    }
+
+    .cart-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .cart-header {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+
+    .cart-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+        .cart-table th {
+            background: #e8f5e9;
+            padding: 15px;
+        }
+
+        .cart-table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .quantity-input {
+        width: 70px;
+        padding: 5px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .btn-update {
+        background: #ffc107;
+        color: #333;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-update:hover {
+            background: #e0a800;
+            transform: scale(1.05);
+        }
+
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-remove:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+    .cart-summary {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-checkout {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+        .btn-checkout:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #1b5e20, #4caf50);
+        }
+
+    .btn-shop {
+        background: #17a2b8;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        transition: 0.3s;
+    }
+
+        .btn-shop:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+        .empty-cart i {
+            font-size: 80px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="cart-container">
+    <div class="cart-header">
+        <h2><i class="fas fa-shopping-cart"></i> My Shopping Cart</h2>
+        <p>Review your items before checkout</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="cart-table table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.ProductName</td>
+                            <td>
+                                <img src="@item.ImageUrl" class="product-img" alt="@item.ProductName" onerror="this.src='/images/products/default.jpg'">
+                            </td>
+                            <td class="text-success fw-bold">₹@item.Price</td>
+                            <td>
+                                <form asp-action="UpdateCart" method="post" class="d-flex align-items-center gap-2">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <input type="number" name="quantity" value="@item.Quantity" min="1" class="quantity-input" />
+                                    <button type="submit" class="btn-update">
+                                        <i class="fas fa-sync-alt"></i> Update
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="fw-bold text-success">₹@(item.Price* item.Quantity)</td>
+                            <td>
+                                <form asp-action="RemoveFromCart" method="post">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn-remove">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-summary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4>Order Summary</h4>
+                    <p><strong>Total Items:</strong> @Model.Sum(x => x.Quantity)</p>
+                    <p><strong>Subtotal:</strong> <span class="text-success fw-bold">₹@Model.Sum(x => x.Price * x.Quantity)</span></p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a asp-controller="Order" asp-action="CheckoutFromCart" class="btn-checkout">
+                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Your cart is empty!</h3>
+            <p>Looks like you haven't added any items to your cart yet.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn-shop mt-3 d-inline-block">
+                <i class="fas fa-shopping-bag"></i> Continue Shopping
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 3 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 3000);
+    </script>
+}

@@ -1,0 +1,350 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login / Register</title>
+    <meta charset="utf-8" />
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI",sans-serif;
+            background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+        }
+
+        /* Message popup */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideDown 0.5s ease;
+        }
+
+        .success {
+            background: #4CAF50;
+        }
+
+        .error {
+            background: #f44336;
+        }
+
+        @@keyframes slideDown {
+            from {
+                top: -50px;
+                opacity: 0;
+            }
+
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        .card {
+            width: 920px;
+            height: 520px;
+            background: white;
+            display: flex;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,.35);
+        }
+
+        .left {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(rgba(20,120,60,.75),rgba(10,80,40,.8)), url('/images/loginpage.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+            .left h1 {
+                font-size: 34px;
+            }
+
+            .left p {
+                opacity: .9;
+            }
+
+        .right {
+            width: 50%;
+            padding: 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* User Type Tabs */
+        .user-type-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+            .user-type-btn.active {
+                background: linear-gradient(135deg, #2e7d32, #66bb6a);
+                color: white;
+            }
+
+            .user-type-btn:not(.active):hover {
+                background: #f0f0f0;
+            }
+
+        .login-form {
+            display: none;
+        }
+
+            .login-form.active {
+                display: block;
+            }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+            transition: .3s;
+            box-sizing: border-box;
+        }
+
+            input:focus {
+                outline: none;
+                border-color: #4CAF50;
+                box-shadow: 0 0 6px rgba(76,175,80,.3);
+            }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(135deg,#43a047,#66bb6a);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 18px rgba(0,0,0,.25);
+            }
+
+        .switch {
+            text-align: center;
+            margin-top: 18px;
+            color: #2e7d32;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .switch:hover {
+                text-decoration: underline;
+            }
+
+        .social {
+            display: flex;
+            gap: 18px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+            .social img {
+                width: 32px;
+                height: 32px;
+                cursor: pointer;
+                transition: .2s;
+            }
+
+                .social img:hover {
+                    transform: scale(1.2);
+                }
+
+        .hidden {
+            display: none;
+        }
+
+        h2 {
+            margin-bottom: 24px;
+            color: #333;
+        }
+
+        .note {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 12px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SUCCESS / ERROR MESSAGE -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="message success" id="successMessage">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="message error" id="errorMessage">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card">
+
+        <!-- LEFT -->
+        <div class="left">
+            <h1>Organic Marketplace</h1>
+            <p>Fresh, healthy, and organic produce directly from farmers</p>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+
+            <!-- User Type Tabs -->
+            <div class="user-type-tabs">
+                <button class="user-type-btn active" onclick="showUserType('farmer')">👨‍🌾 Farmer</button>
+                <button class="user-type-btn" onclick="showUserType('user')">👤 User</button>
+            </div>
+
+            <!-- FARMER LOGIN -->
+            <div id="farmerLogin" class="login-form active">
+                <h2>Farmer Login</h2>
+                <form method="post" asp-action="Login" asp-controller="Account">
+                    <input type="text" name="email" placeholder="Enter Phone Number" required />
+                    <input type="password" name="password" placeholder="Enter Password" required />
+                    <button type="submit">Login as Farmer</button>
+                </form>
+                <div class="note">
+                    📱 Farmers login using registered phone number<br>
+                    Default password: <strong>farmer123</strong>
+                </div>
+                <div class="switch" onclick="showRegister()">
+                    New user? Register here
+                </div>
+            </div>
+
+            <!-- USER LOGIN -->
+            <div id="userLogin" class="login-form">
+                <h2>User Login</h2>
+                <form method="post" asp-action="Login" asp-controller="Account">
+                    <input type="email" name="email" placeholder="Enter Email" required />
+                    <input type="password" name="password" placeholder="Enter Password" required />
+                    <button type="submit">Login as User</button>
+                </form>
+                
+                <div class="switch" onclick="showRegister()">
+                    New user? Register here
+                </div>
+            </div>
+
+            <!-- REGISTER -->
+            <div id="registerBox" class="hidden">
+                <h2>Create Account</h2>
+                <form asp-action="Register" asp-controller="Account" method="post">
+                    <input name="username" placeholder="Username" required />
+                    <input type="email" name="email" placeholder="Email" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
+                    <button type="submit">Register</button>
+                </form>
+                <div class="switch" onclick="showLogin()">
+                    Already have an account? Login
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function showUserType(type) {
+            // Hide all forms
+            document.getElementById('farmerLogin').classList.remove('active');
+            document.getElementById('userLogin').classList.remove('active');
+            document.getElementById('registerBox').classList.add('hidden');
+
+            // Show selected form
+            if (type === 'farmer') {
+                document.getElementById('farmerLogin').classList.add('active');
+            } else if (type === 'user') {
+                document.getElementById('userLogin').classList.add('active');
+            }
+
+            // Update active button styling
+            var buttons = document.querySelectorAll('.user-type-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function showRegister() {
+            document.getElementById('farmerLogin').classList.remove('active');
+            document.getElementById('userLogin').classList.remove('active');
+            document.getElementById('registerBox').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('registerBox').classList.add('hidden');
+            document.getElementById('userLogin').classList.add('active');
+            document.getElementById('farmerLogin').classList.remove('active');
+
+            // Update active button styling
+            var buttons = document.querySelectorAll('.user-type-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.user-type-btn')[1].classList.add('active');
+        }
+
+        // Auto-hide messages after 3 seconds
+        setTimeout(function() {
+            var successMsg = document.getElementById("successMessage");
+            var errorMsg = document.getElementById("errorMessage");
+            if (successMsg) successMsg.style.display = "none";
+            if (errorMsg) errorMsg.style.display = "none";
+        }, 3000);
+    </script>
+
+</body>
+</html>

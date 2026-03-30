@@ -1,0 +1,155 @@
+﻿@model WebApplication_shravani.Models.Product
+
+@{
+    ViewData["Title"] = "Delete Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8f0fe 100%);
+    }
+
+    .delete-container {
+        max-width: 600px;
+        margin: 60px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .delete-header {
+        background: linear-gradient(135deg, #d32f2f, #f44336);
+        color: white;
+        padding: 25px;
+        text-align: center;
+    }
+
+        .delete-header h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+    .delete-body {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .product-info {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+    }
+
+        .product-info img {
+            max-width: 150px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+    .warning-icon {
+        font-size: 60px;
+        color: #f44336;
+        margin-bottom: 20px;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #d32f2f, #f44336);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        margin: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4);
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        margin: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="delete-container">
+        <div class="delete-header">
+            <h2>🗑️ Delete Product</h2>
+            <p>Are you sure you want to delete this product?</p>
+        </div>
+
+        <div class="delete-body">
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <div class="product-info">
+                <div class="text-center">
+                    <img src="@Model.ImageUrl" alt="@Model.Name" />
+                </div>
+                <h4>@Model.Name</h4>
+                <p><strong>Price:</strong> ₹@Model.Price</p>
+                <p><strong>Description:</strong> @Model.Description</p>
+                <p><strong>Stock:</strong> @Model.StockQuantity units</p>
+                <p>
+                    <strong>Status:</strong>
+                    @if (Model.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Unavailable</span>
+                    }
+                </p>
+            </div>
+
+            <p class="text-danger"><strong>⚠️ This action cannot be undone!</strong></p>
+
+            <form asp-action="DeleteProduct" method="post">
+                <input type="hidden" asp-for="ProductId" />
+                <button type="submit" class="btn-danger">Yes, Delete Product</button>
+                <a asp-action="MyProducts" class="btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

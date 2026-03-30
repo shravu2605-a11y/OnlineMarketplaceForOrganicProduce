@@ -1,0 +1,399 @@
+﻿@{
+    ViewData["Title"] = "Confirm Location";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Location - Organic Marketplace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .location-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .left-panel {
+            width: 40%;
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .left-panel h1 {
+                font-size: 32px;
+                margin-bottom: 15px;
+            }
+
+            .left-panel p {
+                opacity: 0.9;
+                line-height: 1.6;
+            }
+
+        .right-panel {
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .location-card {
+            width: 450px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .btn-location {
+            width: 100%;
+            background: #00c853;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+            .btn-location:hover {
+                background: #009624;
+                transform: translateY(-2px);
+            }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin: 15px 0 8px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+            textarea:focus {
+                border-color: #00c853;
+                outline: none;
+                box-shadow: 0 0 5px rgba(0,200,83,0.3);
+            }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #ff5722, #ff9800);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255,87,34,0.3);
+            }
+
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+            .back-link a {
+                color: #666;
+                text-decoration: none;
+                font-size: 13px;
+            }
+
+                .back-link a:hover {
+                    color: #ff5722;
+                }
+
+        /* Custom Popup Modal */
+        .location-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .location-popup-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            padding: 25px;
+            text-align: center;
+            animation: popupFadeIn 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        @@keyframes popupFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .location-popup-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .location-popup h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .location-popup p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .popup-allow {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .popup-allow:hover {
+                background: #45a049;
+                transform: scale(1.05);
+            }
+
+        .popup-deny {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .popup-deny:hover {
+                background: #da190b;
+                transform: scale(1.05);
+            }
+
+        @@media (max-width: 768px) {
+            .location-container {
+                flex-direction: column;
+            }
+
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+
+            .left-panel {
+                padding: 40px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Popup Modal -->
+    <div id="locationPopup" class="location-popup">
+        <div class="location-popup-content">
+            <div class="location-popup-icon">📍</div>
+            <h3>Allow Location Access?</h3>
+            <p>To detect your delivery address automatically, we need access to your location. This helps us provide accurate delivery estimates.</p>
+            <div class="popup-buttons">
+                <button onclick="allowLocation()" class="popup-allow">✓ Allow</button>
+                <button onclick="denyLocation()" class="popup-deny">✗ Don't Allow</button>
+            </div>
+            <p style="font-size: 12px; margin-top: 15px; color: #999;">You can change this later in browser settings</p>
+        </div>
+    </div>
+
+    <div class="location-container">
+        <div class="left-panel">
+            <h1>📍 Delivery Location</h1>
+            <p>Choose your delivery address to ensure fast and secure delivery of your organic products.</p>
+        </div>
+
+        <div class="right-panel">
+            <div class="location-card">
+                <button onclick="showLocationPopup()" class="btn-location" id="detectLocationBtn">
+                    🔍 Detect My Location
+                </button>
+
+                <label>Delivery Address</label>
+                <textarea id="addressBox" rows="4" placeholder="Enter your full address..."></textarea>
+
+                <form method="post" asp-action="ProceedToPayment">
+                    <input type="hidden" name="location" id="locationInput" />
+                    <input type="hidden" name="address" id="addressInput" />
+                    <button type="submit" class="btn-submit">
+                        Continue to Payment →
+                    </button>
+                </form>
+
+                <div class="back-link">
+                    <a asp-controller="Order" asp-action="PlaceOrder">← Back to Order</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isGettingLocation = false;
+        let popupShown = false;
+
+        function showMessage(msg, isError = false) {
+            alert(msg);
+        }
+
+        function showLocationPopup() {
+            document.getElementById("locationPopup").style.display = "flex";
+        }
+
+        function closeLocationPopup() {
+            document.getElementById("locationPopup").style.display = "none";
+        }
+
+        function allowLocation() {
+            closeLocationPopup();
+            // Show info toast before requesting location
+            showMessage("🌍 Requesting location access...");
+            // Small delay to show toast before browser popup
+            setTimeout(() => {
+                requestLocation();
+            }, 300);
+        }
+
+        function denyLocation() {
+            closeLocationPopup();
+            showMessage("📍 Location access denied. You can enter address manually.");
+        }
+
+        function requestLocation() {
+            if (isGettingLocation) {
+                showMessage("Already detecting location...");
+                return;
+            }
+
+            if (!navigator.geolocation) {
+                showMessage("Geolocation is not supported by your browser", true);
+                return;
+            }
+
+            const btn = document.getElementById("detectLocationBtn");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '📍 Detecting location...';
+            btn.disabled = true;
+            isGettingLocation = true;
+
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    try {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+                        const data = await res.json();
+
+                        if (data && data.display_name) {
+                            document.getElementById("addressBox").value = data.display_name;
+                            showMessage("✅ Location detected successfully!");
+                        } else {
+                            showMessage("Could not get address. Please enter manually.", true);
+                        }
+                    } catch (error) {
+                        showMessage("Error fetching address. Please enter manually.", true);
+                    } finally {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        isGettingLocation = false;
+                    }
+                },
+                function(error) {
+                    let message = "📍 Unable to detect location. Please enter address manually.";
+                    if (error.code === 1) {
+                        message = "📍 Location access denied. Please enter address manually.";
+                    }
+                    showMessage(message, true);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    isGettingLocation = false;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const address = document.getElementById("addressBox").value.trim();
+            if (!address) {
+                e.preventDefault();
+                showMessage("Please enter your delivery address", true);
+                document.getElementById("addressBox").focus();
+                return false;
+            }
+            document.getElementById("addressInput").value = address;
+            document.getElementById("locationInput").value = address;
+        });
+    </script>
+
+</body>
+</html>

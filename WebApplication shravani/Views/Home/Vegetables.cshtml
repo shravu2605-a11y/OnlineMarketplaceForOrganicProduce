@@ -1,0 +1,281 @@
+﻿@model List<WebApplication_shravani.Models.Product>
+
+@{
+    ViewData["Title"] = "Fresh Vegetables";
+}
+
+<style>
+    .vegetables-section {
+        min-height: 100vh;
+        width: 100%;
+        background-image: url('/images/vegetablesection.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+        padding-top: 80px;
+    }
+
+        .vegetables-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+    .content-wrapper {
+        position: relative;
+        z-index: 2;
+        padding: 40px 20px;
+    }
+
+    .vegetables-title {
+        text-align: center;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .product-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+        backdrop-filter: blur(5px);
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .product-card img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: #2e7d32;
+        }
+
+    .price {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2e7d32;
+        margin: 10px 0;
+    }
+
+    .old-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+        margin-left: 8px;
+    }
+
+    .discount {
+        color: #ff5722;
+        font-size: 0.85rem;
+        margin-left: 8px;
+    }
+
+    .delivery {
+        color: #4caf50;
+        font-size: 0.85rem;
+        margin: 8px 0;
+    }
+
+    .rating {
+        color: #ffc107;
+        margin: 10px 0;
+    }
+
+    .btn {
+        background: linear-gradient(135deg, #2e7d32, #66bb6a);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #1b5e20, #4caf50);
+            color: white;
+            text-decoration: none;
+        }
+
+    .no-products {
+        text-align: center;
+        padding: 50px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        margin: 20px auto;
+        max-width: 500px;
+    }
+</style>
+
+<div class="vegetables-section">
+    <div class="content-wrapper">
+        <h1 class="vegetables-title">🥬 Fresh Organic Vegetables 🍅🥕</h1>
+        <p style="text-align: center; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Directly from certified organic farms</p>
+
+        <div class="product-grid">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var product in Model)
+                {
+                    <div class="product-card">
+                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/products/default.jpg" : product.ImageUrl)"
+                             alt="@product.Name">
+
+                        <h3>@product.Name</h3>
+
+                        <div class="price">
+                            ₹@product.Price
+                            <span class="old-price">₹@(product.Price + 15)</span>
+                            <span class="discount">10% OFF</span>
+                        </div>
+
+                        <div class="delivery">🚚 Free Delivery</div>
+
+                        <div class="rating">
+                            @if (product.AverageRating > 0)
+                            {
+                                for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= product.AverageRating)
+                                    {
+                                        <span>⭐</span>
+                                    }
+                                    else
+                                    {
+                                        <span>☆</span>
+                                    }
+                                }
+                                <span>(@product.TotalReviews reviews)</span>
+                            }
+                            else
+                            {
+                                <span>No reviews yet</span>
+                            }
+                        </div>
+
+                        <div>
+                            <a asp-controller="Product"
+                               asp-action="Details"
+                               asp-route-id="@product.ProductId"
+                               class="btn">
+                                View Details
+                            </a>
+
+                            <a asp-controller="Order" asp-action="AddToCart" asp-route-id="@product.ProductId" class="btn">
+                                Add to Cart
+                            </a>
+
+                            <a asp-controller="Order"
+                               asp-action="BuyNow"
+                               asp-route-id="@product.ProductId"
+                               class="btn">
+                                Buy Now
+                            </a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-products">
+                    <h3>No vegetables available at the moment</h3>
+                    <p>Please check back later for fresh organic vegetables!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function addToCart(productId) {
+        fetch(`/Order/AddToCart?id=${productId}&quantity=1`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, "success");
+                updateCartCount();
+            } else {
+                showToast(data.message, "warning");
+                if (data.redirect) {
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1500);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast("Something went wrong. Please try again.", "error");
+        });
+    }
+
+    function buyNow(productId) {
+        window.location.href = `/Order/BuyNow/${productId}`;
+    }
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        let bgColor = type === 'success' ? '#2e7d32' : (type === 'warning' ? '#ff9800' : '#dc3545');
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${bgColor}; color:white; padding:12px 24px; border-radius:50px; z-index:9999; animation: slideIn 0.3s ease; box-shadow:0 5px 15px rgba(0,0,0,0.2);`;
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function updateCartCount() {
+        fetch('/Cart/GetCartCount')
+            .then(response => response.json())
+            .then(data => {
+                const cartIcon = document.querySelector('.navbar-right a[href*="Cart"]');
+                if (cartIcon && data.count > 0) {
+                    cartIcon.innerHTML = `🛒 Cart (${data.count})`;
+                } else if (cartIcon) {
+                    cartIcon.innerHTML = `🛒 Cart`;
+                }
+            })
+            .catch(error => console.error('Error updating cart count:', error));
+    }
+</script>

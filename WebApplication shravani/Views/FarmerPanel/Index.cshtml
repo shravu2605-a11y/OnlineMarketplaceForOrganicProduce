@@ -1,0 +1,53 @@
+﻿@model IEnumerable<WebApplication_shravani.Models.Farmer>
+
+<h2 class="text-center">👨‍🌾 Manage Farmers</h2>
+
+<table class="table table-bordered table-striped">
+
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Area</th>
+            <th>Farm Type</th>
+            <th>Certification</th>
+            <th>Certificate</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var farmer in Model)
+        {
+            <tr>
+                <td>@farmer.Name</td>
+                <td>@farmer.Phone</td>
+                <td>@farmer.City</td>
+                <td>@farmer.Area</td>
+                <td>@farmer.FarmType</td>
+                <td>@farmer.Certification</td>
+
+                <td>
+                    <img src="@farmer.CertificateImage" width="80" />
+                </td>
+
+                <td>
+                    <a asp-action="Details" asp-route-id="@farmer.Id" class="btn btn-info btn-sm">
+                        View Profile
+                    </a>
+
+                    <a asp-action="Edit" asp-route-id="@farmer.Id" class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete" asp-route-id="@farmer.Id" class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>

@@ -1,0 +1,441 @@
+﻿@model WebApplication_shravani.Models.ViewModels.ProductDetailsViewModel
+
+<style>
+    .related-card .btn-cart {
+        background: linear-gradient(135deg, #ff7a18, #ffb347);
+        color: white;
+        border-radius: 20px;
+        padding: 8px 16px;
+        transition: 0.3s;
+    }
+
+        .related-card .btn-cart:hover {
+            background: linear-gradient(135deg, #ff512f, #dd2476);
+        }
+
+    .rating-stars {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+        .rating-stars input {
+            display: none;
+        }
+
+        .rating-stars label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ddd;
+            margin: 0 2px;
+            transition: color 0.2s;
+        }
+
+            .rating-stars label i {
+                font-size: 1.5rem;
+            }
+
+            .rating-stars input:checked ~ label i,
+            .rating-stars label:hover i,
+            .rating-stars label:hover ~ label i {
+                color: #ffc107;
+            }
+
+    .rating-display i {
+        font-size: 1rem;
+        margin-right: 1px;
+    }
+
+    .review-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: box-shadow 0.3s;
+    }
+
+        .review-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+    .verified-badge {
+        background-color: #28a745;
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-left: 8px;
+    }
+
+    .rating-summary {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .average-rating {
+        font-size: 48px;
+        font-weight: bold;
+        color: #ffc107;
+    }
+
+    .write-review-btn {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+        .write-review-btn:hover {
+            background: linear-gradient(135deg, #20c997, #28a745);
+            transform: scale(1.05);
+        }
+
+    .simple-stars {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .simple-star {
+        font-size: 30px;
+        cursor: pointer;
+        color: #ddd;
+        transition: color 0.2s;
+    }
+
+        .simple-star.active {
+            color: #ffc107;
+        }
+
+    .toast-message {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 50px;
+        z-index: 10000;
+        color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        animation: slideIn 0.3s ease;
+    }
+
+    @@keyframes slideIn {
+        from
+
+    {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    }
+</style>
+
+<div class="product-hero">
+    <div class="product-container">
+        <div class="product-image-box">
+            <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" width="300" />
+        </div>
+
+        <div class="product-info-box">
+            <h1>@Model.Product.Name</h1>
+
+            <div class="rating-display mb-2">
+                @await Html.PartialAsync("_StarRatingPartial", (double)Model.Product.AverageRating)
+                <span class="text-muted ms-2">(@Model.Product.TotalReviews reviews)</span>
+            </div>
+
+            <div class="price-row">
+                <span class="price">₹@Model.Product.Price</span>
+                <span class="old-price">₹@(Model.Product.Price + 100)</span>
+                <span class="discount">15% off</span>
+            </div>
+
+            <p class="description">@Model.Product.Description</p>
+
+            <div class="delivery-box">
+                <strong>Delivery:</strong> Free delivery in 2–3 days<br />
+                <strong>Location:</strong> Mumbai, India
+            </div>
+
+            <div class="action-buttons">
+                <a asp-controller="Order" asp-action="AddToCart" asp-route-id="@Model.Product.ProductId" class="btn-cart">
+                    Add to Cart
+                </a>
+                <a asp-controller="Order" asp-action="BuyNow" asp-route-id="@Model.Product.ProductId" class="btn-buy">
+                    Buy Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOMER REVIEWS SECTION -->
+<div class="reviews-section" style="margin: 40px auto; max-width: 1200px; padding: 0 20px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Customer Reviews</h2>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="rating-summary">
+                <div class="average-rating">@Model.Product.AverageRating.ToString("0.0")</div>
+                <div class="rating-display mb-2">
+                    @await Html.PartialAsync("_StarRatingPartial", (double)Model.Product.AverageRating)
+                </div>
+                <p class="text-muted">Based on @Model.Product.TotalReviews reviews</p>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="write-review-btn" onclick="openReviewModal()">
+                        <i class="fas fa-pen"></i> Write a Review
+                    </button>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="write-review-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login to Review
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            @if (Model.Product.Reviews != null && Model.Product.Reviews.Any())
+            {
+                foreach (var review in Model.Product.Reviews.OrderByDescending(r => r.CreatedDate))
+                {
+                    <div class="review-card">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="rating-display mb-1">
+                                    @await Html.PartialAsync("_StarRatingPartial", (double)review.Rating)
+                                </div>
+                                <strong>@review.Customer?.UserName</strong>
+                                @if (review.IsVerifiedPurchase)
+                                {
+                                    <span class="verified-badge">Verified Purchase</span>
+                                }
+                            </div>
+                            <small class="text-muted">@review.CreatedDate.ToString("MMM dd, yyyy")</small>
+                        </div>
+                        <p class="mt-2 mb-0">@review.Comment</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No reviews yet. Be the first to review this product!
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- RELATED PRODUCTS -->
+<div class="related-section">
+    <h2>Related Products</h2>
+    <div class="related-scroll">
+        @foreach (var item in Model.RelatedProducts)
+        {
+            <div class="related-card">
+                <span class="badge">SAVE 15%</span>
+                <img src="@item.ImageUrl" width="150" />
+                <h4>@item.Name</h4>
+                <div class="price-row">
+                    <span class="price">₹@item.Price</span>
+                    <span class="old-price">₹@(item.Price + 100)</span>
+                </div>
+                <div class="related-buttons">
+                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" class="btn-view">View Details</a>
+                    <a asp-controller="Order" asp-action="AddToCart" asp-route-id="@item.ProductId" class="btn-cart">Add to Cart</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="reviewModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; width: 450px; border-radius: 15px; padding: 25px; max-width: 90%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>Write a Review for @Model.Product.Name</h3>
+            <button onclick="closeReviewModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Your Rating</label>
+            <div class="simple-stars" id="starContainer">
+                <span class="simple-star" data-value="1">★</span>
+                <span class="simple-star" data-value="2">★</span>
+                <span class="simple-star" data-value="3">★</span>
+                <span class="simple-star" data-value="4">★</span>
+                <span class="simple-star" data-value="5">★</span>
+            </div>
+            <input type="hidden" id="selectedRating" value="" />
+            <small id="ratingError" style="color: red; display: none;">Please select a rating</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Your Review</label>
+            <textarea id="reviewText" class="form-control" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
+            <small class="text-muted">Minimum 5 characters</small>
+        </div>
+
+        <button id="submitReviewBtn" class="btn btn-success" style="width: 100%; padding: 10px;">Submit Review</button>
+    </div>
+</div>
+
+<script>
+    let currentRating = 0;
+
+    // Star rating functionality
+    const stars = document.querySelectorAll('.simple-star');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            currentRating = parseInt(this.getAttribute('data-value'));
+            document.getElementById('selectedRating').value = currentRating;
+
+            stars.forEach((s, index) => {
+                if (index < currentRating) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+            document.getElementById('ratingError').style.display = 'none';
+        });
+
+        star.addEventListener('mouseenter', function() {
+            const value = parseInt(this.getAttribute('data-value'));
+            stars.forEach((s, index) => {
+                if (index < value) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+
+        star.addEventListener('mouseleave', function() {
+            stars.forEach((s, index) => {
+                if (index < currentRating) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+    });
+
+    function openReviewModal() {
+        currentRating = 0;
+        document.getElementById('selectedRating').value = '';
+        document.getElementById('reviewText').value = '';
+        stars.forEach(s => s.classList.remove('active'));
+        document.getElementById('ratingError').style.display = 'none';
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+    }
+
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.style.background = isError ? '#dc3545' : '#2e7d32';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Submit review using button ID
+    document.getElementById('submitReviewBtn').addEventListener('click', function() {
+        const rating = document.getElementById('selectedRating').value;
+        const comment = document.getElementById('reviewText').value.trim();
+        const productId = @Model.Product.ProductId;
+
+        if (!rating) {
+            document.getElementById('ratingError').style.display = 'block';
+            return;
+        }
+
+        if (comment.length < 5) {
+            alert('Please write at least 5 characters');
+            return;
+        }
+
+        const btn = this;
+        const originalText = btn.innerText;
+        btn.innerText = 'Submitting...';
+        btn.disabled = true;
+
+        fetch('/Product/AddReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ProductId: productId,
+                Rating: parseInt(rating),
+                Comment: comment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+
+            if (data.success) {
+                showToast(data.message);
+                closeReviewModal();
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast(data.message, true);
+            }
+        })
+        .catch(error => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            console.error('Error:', error);
+            showToast('Something went wrong. Please try again.', true);
+        });
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('reviewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeReviewModal();
+        }
+    });
+
+    @if (TempData["Success"] != null)
+    {
+            <text>
+            showToast('@TempData["Success"]');
+            </text>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+            <text>
+            showToast('@TempData["Error"]', true);
+            </text>
+    }
+</script>

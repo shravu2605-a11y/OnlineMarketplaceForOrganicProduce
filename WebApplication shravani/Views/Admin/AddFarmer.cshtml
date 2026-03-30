@@ -1,0 +1,85 @@
+﻿@model WebApplication_shravani.Models.Farmer
+
+@{
+    ViewData["Title"] = "Add Farmer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fa fa-user-plus"></i> Add New Farmer</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddFarmer" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Name" class="form-label">Name *</label>
+                                <input asp-for="Name" class="form-control" required />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label">Phone Number *</label>
+                                <input asp-for="Phone" class="form-control" required />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="City" class="form-label">City</label>
+                                <input asp-for="City" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Area" class="form-label">Area</label>
+                                <input asp-for="Area" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FarmType" class="form-label">Farm Type</label>
+                                <input asp-for="FarmType" class="form-control" placeholder="e.g., Vegetable, Fruit, Mixed" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Certification" class="form-label">Certification</label>
+                                <input asp-for="Certification" class="form-control" placeholder="e.g., Organic, Natural" />
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="fa fa-info-circle"></i> <strong>Note:</strong> Farmers can login using their phone number with password: <strong>farmer123</strong>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save"></i> Add Farmer
+                            </button>
+                            <a asp-action="ManageFarmers" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
